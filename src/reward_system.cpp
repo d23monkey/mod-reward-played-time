@@ -1,12 +1,12 @@
 //Reward system made by Talamortis
 
-#include "Configuration/Config.h"
-#include "Player.h"
 #include "AccountMgr.h"
-#include "ScriptMgr.h"
+#include "Chat.h"
+#include "Configuration/Config.h"
 #include "Define.h"
 #include "GossipDef.h"
-#include "Chat.h"
+#include "Player.h"
+#include "ScriptMgr.h"
 
 bool RewardSystem_Enable;
 uint32 Max_roll;
@@ -15,20 +15,28 @@ class reward_system : public PlayerScript
 {
 
 public:
-    reward_system() : PlayerScript("reward_system") {}
+    reward_system() : PlayerScript("reward_system", {
+        PLAYERHOOK_ON_LOGIN,
+        PLAYERHOOK_ON_BEFORE_UPDATE
+    }) {}
 
     uint32 initialTimer = (sConfigMgr->GetOption<uint32>("RewardTime", 1) * HOUR * IN_MILLISECONDS);
     uint32 RewardTimer = initialTimer;
-    int32 roll;
+    int32 roll = 0;
 
-    void OnLogin(Player* player)  override
+    void OnPlayerLogin(Player* player)  override
     {
-        if (sConfigMgr->GetOption<bool>("RewardSystemEnable", true) && sConfigMgr->GetOption<bool>("RewardSystem.Announce", true)) {
-            ChatHandler(player->GetSession()).SendSysMessage("本服务器正在运行 |cff4CFF00时间奖励 |r模块.");
+        if (sConfigMgr->GetOption<bool>("RewardSystemEnable", true) && sConfigMgr->GetOption<bool>("RewardSystem.Announce", true))
+        {
+			uint32 loc = player->GetSession()->GetSessionDbLocaleIndex();
+            if (loc == 4)
+                ChatHandler(player->GetSession()).SendSysMessage("|cff00ff00本服务端已加载|r |cff00ccff泡点抽奖 |r|cff00ff00模块.|r");
+            else
+				ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00Reward Time Played |rmodule.");
         }
     }
 
-    void OnBeforeUpdate(Player* player, uint32 p_time) override
+    void OnPlayerBeforeUpdate(Player* player, uint32 p_time) override
     {
         if (sConfigMgr->GetOption<bool>("RewardSystemEnable", true))
         {
@@ -45,7 +53,7 @@ public:
 
                     if (!result)
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("[奖励系统] 祝你下次好运！你的掷骰结果是 {}.", roll);
+                        ChatHandler(player->GetSession()).PSendSysMessage("[奖励系统] 很遗憾，你没有中奖，你的掷骰结果是 {}. 祝你下次好运！", roll);
                         RewardTimer = initialTimer;
                         return;
                     }
@@ -66,7 +74,8 @@ public:
 
                     RewardTimer = initialTimer;
                 }
-                else  RewardTimer -= p_time;
+                else
+                    RewardTimer -= p_time;
             }
         }
     }
@@ -144,7 +153,9 @@ public:
 class reward_system_conf : public WorldScript
 {
 public:
-    reward_system_conf() : WorldScript("reward_system_conf") { }
+    reward_system_conf() : WorldScript("reward_system_conf", {
+        WORLDHOOK_ON_BEFORE_CONFIG_LOAD
+    }) { }
 
     void OnBeforeConfigLoad(bool reload) override
     {
