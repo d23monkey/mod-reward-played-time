@@ -53,7 +53,7 @@ public:
 
                     if (!result)
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("|cffFF4A2D[奖励系统]|r 很遗憾，你没有中奖，你的掷骰结果是 {}. 祝你下次好运！", roll);
+                        ChatHandler(player->GetSession()).PSendSysMessage("|cff00ccff[奖励系统]|r 很遗憾，你没有中奖，你的掷骰结果是 {}. 祝你下次好运！", roll);
                         RewardTimer = initialTimer;
                         return;
                     }
@@ -70,7 +70,7 @@ public:
                         SendRewardToPlayer(player, pItem, quantity);
                     } while (result->NextRow());
 
-                    ChatHandler(player->GetSession()).PSendSysMessage("|cffFF4A2D[奖励系统]|r 恭喜你，你以掷骰子的结果{}获胜了.", roll);
+                    ChatHandler(player->GetSession()).PSendSysMessage("|cff00ccff[奖励系统]|r 恭喜你，你以掷骰子的结果{}获胜了.", roll);
 
                     RewardTimer = initialTimer;
                 }
@@ -97,13 +97,13 @@ public:
 
         if (!item_proto)
         {
-            LOG_ERROR("module", "|cffFF4A2D[奖励系统]|r 物品ID无效: {}", itemId);
+            LOG_ERROR("module", "|cff00ccff[奖励系统]|r 物品ID无效: {}", itemId);
             return;
         }
 
         if (count < 1 || (item_proto->MaxCount > 0 && count > uint32(item_proto->MaxCount)))
         {
-            LOG_ERROR("module", "|cffFF4A2D[奖励系统]|r 物品数量无效: {} : {}", itemId, count);
+            LOG_ERROR("module", "|cff00ccff[奖励系统]|r 物品数量无效: {} : {}", itemId, count);
             return;
         }
 
@@ -121,7 +121,7 @@ public:
 
         if (items.size() > MAX_MAIL_ITEMS)
         {
-            LOG_ERROR("module", "|cffFF4A2D[奖励系统]|r 最大邮寄物品数为 {}, 当前大小: {}", MAX_MAIL_ITEMS, items.size());
+            LOG_ERROR("module", "|cff00ccff[奖励系统]|r 最大邮寄物品数为 {}, 当前大小: {}", MAX_MAIL_ITEMS, items.size());
             return;
         }
 
